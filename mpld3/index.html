@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mpld3 test</title>
+
+<body>
+  <h1>mpld3 x flask</h1>
+  <div>{{ fig|safe }}</div>
+  <p>change figure title</p>
+  <form action="/new-title" method="POST">
+    <input type="text" name="title" value="{{ title }}" placeholder="test title">
+    <input type="submit" name="a" value="submit">
+  </form>
+</body>
+</html>
