@@ -1,7 +1,7 @@
 
 
 - https://github.com/takuyaa/kuromoji.js
-- [Node.js】kuromoji.js + mecab-ipadic-neologdで形態素解析して遊ぶ - Qiita](https://qiita.com/mabasasi/items/17b0bf735c38b4642682)
+- [【Node.js】kuromoji.js + mecab-ipadic-neologdで形態素解析して遊ぶ - Qiita](https://qiita.com/mabasasi/items/17b0bf735c38b4642682)
 
 
 ```javascript
@@ -13,7 +13,7 @@ kuromoji.builder({ dicPath: './dict' }).build((err, tokenizer) => {
   }
   const tokens = tokenizer.tokenize(`すもももももももものうち`)
   console.log(tokens)
-  console.log(JSON.stringify(tokens, null, '    '))
+  console.log(JSON.stringify(tokens, null, 4))
 })
 
 // snippet2
@@ -28,7 +28,7 @@ const buildTokenizer = option => {
 const tokenizer = await buildTokenizer({ dicPath: './dict' })
 const tokens = tokenizer.tokenize(`すもももももももものうち`)
 console.log(tokens)
-console.log(JSON.stringify(tokens, null, '    '))
+console.log(JSON.stringify(tokens, null, 4))
 
 
 /*

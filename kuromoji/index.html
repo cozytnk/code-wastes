@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>easy tokenize</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+
+  <!-- https://github.com/takuyaa/kuromoji.js -->
+  <script src="./kuromoji.js"></script>
+
+  <!-- https://github.com/googlearchive/code-prettify -->
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      height: 100vh;
+      margin: 0;
+      padding: 0 20px 24px;
+    }
+    .root {
+      height: 100%;
+      display: grid;
+      /* grid-template-rows: auto auto minmax(0, 100%); */
+      grid-template-rows: auto auto 1fr;
+      grid-template-columns: 50% 50%;
+      grid-template-areas:
+        "header        header        "
+        "input-control output-control"
+        "input         output        ";
+      gap: 12px;
+    }
+    textarea { resize: none; }
+    pre {
+      overflow: auto;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="root" id="app">
+
+    <div style="grid-area: header;">
+      <h1>easy tokenize</h1>
+      <a href="https://github.com/takuyaa/kuromoji.js">https://github.com/takuyaa/kuromoji.js</a>
+      <br>
+      <a href="https://qiita.com/mabasasi/items/17b0bf735c38b4642682">【Node.js】kuromoji.js + mecab-ipadic-neologdで形態素解析して遊ぶ - Qiita</a>
+      <br>
+      <br>
+    </div>
+
+    <div style="grid-area: input-control;">
+      <span>{{ tokenizerBuildError ? '&#10071;could not build tokenizer.' : '' }}</span>
+      <button @click="tokenize">tokenize</button>
+    </div>
+    <textarea style="grid-area: input;" placeholder="input text here" v-model="text"></textarea>
+
+    <div style="grid-area: output-control;">
+      <select v-model="jsonFormat">
+        <option value="4">JSON with 4 spaces</option>
+        <option value="2">JSON with 2 spaces</option>
+        <option value="min">JSON min</option>
+        <option value="s">separeted by " " (surface_form)</option>
+        <option value="#">separeted by "#" (surface_form)</option>
+        <option value="/">separeted by "/" (surface_form)</option>
+        <option value="sb">separeted by " " (basic_form)</option>
+        <option value="#b">separeted by "#" (basic_form)</option>
+        <option value="/b">separeted by "/" (basic_form)</option>
+      </select>
+      <button @click="copy">copy</button>
+      <span>{{ showsCopied ? '&#x2714;copied.' : '' }}</span>
+    </div>
+    <pre style="grid-area: output;" class="prettyprint lang-js"><code>{{ result }}</code></pre>
+
+  </div>
+
+  <script>
+    const buildTokenizer = option => {
+      return new Promise((resolve, reject) => {
+        kuromoji.builder(option).build((err, tokenizer) => err ? reject(err) : resolve(tokenizer))
+      })
+    }
+    const app = new Vue({
+      el: '#app',
+      data () {
+        return {
+          tokenizer: null,
+          tokenizerBuildError: false,
+          text: 'すもももももももものうち',
+          tokens: null,
+          jsonFormat: '4',
+          showsCopied: false,
+        }
+      },
+      computed: {
+        result () {
+          return this.jsonFormat === 'min' ? JSON.stringify(this.tokens, null, 0)
+          : this.jsonFormat === '4' ? JSON.stringify(this.tokens, null, 4)
+          : this.jsonFormat === '2' ? JSON.stringify(this.tokens, null, 2)
+          : this.jsonFormat === 's' ? this.tokens.map(t => t.surface_form).join(' ')
+          : this.jsonFormat === '#' ? this.tokens.map(t => t.surface_form).join('#')
+          : this.jsonFormat === '/' ? this.tokens.map(t => t.surface_form).join('/')
+          : this.jsonFormat === 'sb' ? this.tokens.map(t => t.basic_form).join(' ')
+          : this.jsonFormat === '#b' ? this.tokens.map(t => t.basic_form).join('#')
+          : this.jsonFormat === '/b' ? this.tokens.map(t => t.basic_form).join('/')
+          : JSON.stringify(this.tokens)
+        },
+      },
+      mounted () {
+        buildTokenizer({ dicPath: './dict' })
+        .then(tokenizer => this.tokenizer = tokenizer)
+        .catch(err => this.tokenizerBuildError = true)
+      },
+      methods: {
+        tokenize () {
+          this.tokens = this.tokenizer.tokenize(this.text)
+        },
+        copy () {
+          navigator.clipboard.writeText(this.result)
+          this.showsCopied = true
+          setTimeout(() => this.showsCopied = false, 2000)
+        },
+      },
+    })
+  </script>
+</body>
