@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- REF: https://stackoverflow.com/questions/2011142/how-to-change-the-style-of-the-title-attribute-inside-an-anchor-tag -->
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 100px;
+    }
+
+    .tooltip {
+      position: relative;
+    }
+    .tooltip[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      top: -100%;
+      left: 0;
+    }
+
+    .tooltip3 {
+      position: relative;
+    }
+    .tooltip3 tooltip {
+      display: none;
+    }
+    .tooltip3:hover tooltip {
+      position: absolute;
+      top: -100%;
+      left: 0;
+      display: block;
+    }
+
+    /* 結論、これ */
+    *[tooltip] {
+      position: relative;
+    }
+    *[tooltip]:hover::after {
+      content: attr(tooltip);
+      position: absolute;
+      top: -100%;
+      left: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <button title="hellow">button1</button>
+  <button class="tooltip" title="hellow">button2</button>
+  <button class="tooltip3">button3<tooltip>hellow</tooltip></button>
+  <!-- 結論、これ -->
+  <button tooltip="hellow">button4</button>
+</body>
