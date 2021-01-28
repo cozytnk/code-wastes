@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>test</title>
+
+  <!-- https://jp.vuejs.org/v2/guide/installation.html -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+
+  <!-- https://p5js.org/download/ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
+
+
+  <!-- https://leafletjs.com/ -->
+  <!-- REF: https://switch2osm.org/using-tiles/getting-started-with-leaflet/ -->
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+  <style>
+    /* * { box-sizing: border-box; } */
+    head, body { width: 100vw; height: 100vh; margin: 0; padding: 0; }
+    .root, #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="root" id="app">
+    <div id="map"></div>
+  </div>
+
+
+<script>
+// const map = L.map('map').setView({lon: 0, lat: 0}, 2)
+// 栃木市緯度経度 https://www.geocoding.jp/?q=%93%C8%96%D8%8C%A7%93%C8%96%D8%8Es%96%9C%92%AC17%81%7C14
+const map = L.map('map').setView({ lon: 139.736565, lat: 36.383957 }, 14)
+
+// add the OpenStreetMap tiles
+const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+}).addTo(map)
+
+{
+  // オーバーレイ表示
+  // REF: https://kiguchi999.hatenablog.com/entry/leaflet-add-overlay
+  const kokudoLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
+    attribution: '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',
+  })
+  const baseMap = { 'OpenStreetMap': osmLayer, '国土地理院オルソ': kokudoLayer }
+  const kokudoContourLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>',
+  }).setOpacity(0.65)
+  const overlayLayer = { '傾斜量図': kokudoContourLayer }
+  L.control.layers(baseMap, overlayLayer, { collapsed: false }).addTo(map)
+}
+
+// show the scale bar on the lower left corner
+L.control.scale().addTo(map)
+
+// show a marker on the map
+L.marker({ lon: 139.736565, lat: 36.383957 }).bindPopup('栃木市').addTo(map)
+
+</script>
+</body>
